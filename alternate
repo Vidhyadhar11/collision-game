@@ -1,0 +1,57 @@
+import pygame
+import random
+
+pygame.init()
+
+win = pygame.display.set_mode((500, 500))
+
+start_pos = [0, 470]
+end_pos = [500, 470]
+gravity = 5
+vel = 18
+black = (0, 0, 0)
+white = (2, 200, 200)
+
+hit = 0
+dino = pygame.Rect(20, 400, 30, 40)
+
+obstracles = []
+number = 5
+for i in range(number):
+    ox = 500 + i * 500 // number
+    oy = random.randint(0, 412)
+    obstracles.append(pygame.Rect(ox, oy, 25, 60))
+
+run = True
+clock = pygame.time.Clock()
+while run:
+
+    clock.tick(60)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_UP]:
+        dino.y -= vel
+    else:
+        dino.y = min(428, dino.y + gravity)
+
+    for obstracle in obstracles:
+        obstracle.x -= 3
+        if obstracle.right <= 0:
+            obstracle.x = 500
+            obstracle.y = random.randint(0, 412)
+
+        if dino.colliderect(obstracle):
+            hit += 1
+
+    win.fill(black)
+    color = (min(hit, 255), max(255 - hit, 0), 0)
+    pygame.draw.rect(win, color, dino)
+    for obstracle in obstracles:
+        pygame.draw.rect(win, white, obstracle)
+    pygame.draw.line(win, white, start_pos, end_pos, 2)
+    pygame.display.update()
+
+pygame.quit()
